@@ -1,6 +1,6 @@
 #include "CalculatorWindow.h" // variabel !!!!!!!!!!!!
 #include <QApplication>       // jendela utama
-#include <QClipboard>         // untuk fungsi copy paste hasil conversi
+#include <QClipboard>         // untuk fungsi copy paste hasil konversi
 #include <QFrame>             // border radius
 #include <QGridLayout>        // susunan widget jadi kotak
 #include <QHBoxLayout>        // susunan widget jadi horizontal
@@ -12,6 +12,7 @@
 #include <QNetworkRequest>    // Request API
 #include <QScreen>            // penempatan window di tengah layar
 #include <QVBoxLayout>        // susunan widget jadi vertikal
+
 CalculatorWindow::CalculatorWindow(QWidget *parent)
     : QMainWindow(parent), currentMathValue(0.0), pendingMathOp(""),
       waitingForNewOperand(true), isUpdatingBoxes(false), prevTempFromIdx(0),
@@ -58,15 +59,26 @@ void CalculatorWindow::setupUi() {
 
   QPushButton *closeBtn = new QPushButton("✕");
   closeBtn->setFixedSize(28, 28);
+  closeBtn->setFocusPolicy(Qt::NoFocus);
   closeBtn->setStyleSheet(
       "QPushButton { background-color: transparent; border: none; font-weight: "
       "bold; font-size: 14px; color: #888; border-radius: 14px; }"
       "QPushButton:hover { background-color: #ff4d4d; color: white; }");
   connect(closeBtn, &QPushButton::clicked, this, &QWidget::close);
 
+  QPushButton *minBtn = new QPushButton("–");
+  minBtn->setFixedSize(28, 28);
+  minBtn->setFocusPolicy(Qt::NoFocus);
+  minBtn->setStyleSheet(
+      "QPushButton { background-color: transparent; border: none; font-weight: "
+      "bold; font-size: 14px; color: #888; border-radius: 14px; }"
+      "QPushButton:hover { background-color: #dddddd; color: black; }");
+  connect(minBtn, &QPushButton::clicked, this, &QWidget::showMinimized);
+
   titleBarLayout->addWidget(titleIcon);
   titleBarLayout->addWidget(titleLabel);
   titleBarLayout->addStretch();
+  titleBarLayout->addWidget(minBtn);
   titleBarLayout->addWidget(closeBtn);
 
   mainLayout->addLayout(titleBarLayout);
@@ -86,6 +98,7 @@ void CalculatorWindow::setupUi() {
   mathDisplay = new QLineEdit("0");
   mathDisplay->setReadOnly(true);
   mathDisplay->setAlignment(Qt::AlignRight);
+  mathDisplay->setFocusPolicy(Qt::NoFocus);
   QFont font = mathDisplay->font();
   font.setPointSize(24);
   mathDisplay->setFont(font);
@@ -100,6 +113,7 @@ void CalculatorWindow::setupUi() {
       QPushButton *btn = new QPushButton(buttons[pos]);
       btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
       btn->setFont(font);
+      btn->setFocusPolicy(Qt::NoFocus);
       gridLayout->addWidget(btn, i, j);
 
       if (buttons[pos] == "C") {
@@ -115,6 +129,7 @@ void CalculatorWindow::setupUi() {
   QPushButton *backBtn = new QPushButton("⌫");
   backBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   backBtn->setFont(font);
+  backBtn->setFocusPolicy(Qt::NoFocus);
   connect(backBtn, &QPushButton::clicked, this,
           &CalculatorWindow::onMathBackspace);
   gridLayout->addWidget(backBtn, 4, 0, 1, 2);
@@ -122,6 +137,7 @@ void CalculatorWindow::setupUi() {
   QPushButton *eqBtn = new QPushButton("=");
   eqBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   eqBtn->setFont(font);
+  eqBtn->setFocusPolicy(Qt::NoFocus);
   connect(eqBtn, &QPushButton::clicked, this,
           &CalculatorWindow::onMathCalculate);
   gridLayout->addWidget(eqBtn, 4, 2, 1, 2);
@@ -299,7 +315,9 @@ void CalculatorWindow::processMathInput(const QString &text) {
     pendingMathOp = text;
     currentMathValue = mathDisplay->text().toDouble();
     waitingForNewOperand = true;
-    mathHistory->setText(QString::number(currentMathValue) + " " +
+    mathDisplay->setText("0"); // clear hantu
+
+    mathHistory->setText(QString::number(currentMathValue, 'g', 15) + " " +
                          pendingMathOp);
   } else {
     if (waitingForNewOperand) {
@@ -326,7 +344,8 @@ void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
     onMathCalculate();
   } else if (key == Qt::Key_Escape) {
     onMathClear();
-  } else if (key == Qt::Key_Backspace) {
+  } else if (key == Qt::Key_Backspace || key == Qt::Key_Delete ||
+             text == "\b" || text == "\x7F") {
     onMathBackspace();
   } else if (QString("0123456789.+-*/").contains(text) && !text.isEmpty()) {
     processMathInput(text);
@@ -370,7 +389,8 @@ void CalculatorWindow::onMathCalculate() {
     }
     result = currentMathValue / operand;
   }
-  mathDisplay->setText(QString::number(result));
+  // 15 digit angka batas toleransi sebelum akhirnya mengeluarkan "e".
+  mathDisplay->setText(QString::number(result, 'g', 15));
   mathHistory->setText("");
   pendingMathOp = "";
   waitingForNewOperand = true;
