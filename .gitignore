@@ -1,0 +1,10 @@
+.cache/
+build/
+compile_commands.json
+.clangd
+
+# for visual studio
+.vs/
+out/
+*.sln
+*.vcxproj.user
