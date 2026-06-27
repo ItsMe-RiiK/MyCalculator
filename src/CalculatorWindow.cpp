@@ -1,6 +1,7 @@
 #include "CalculatorWindow.h" // variabel !!!!!!!!!!!!
 #include <QApplication>       // jendela utama
 #include <QClipboard>         // untuk fungsi copy paste hasil conversi
+#include <QFrame>             // border radius
 #include <QGridLayout>        // susunan widget jadi kotak
 #include <QHBoxLayout>        // susunan widget jadi horizontal
 #include <QIcon>              // Ikon di window title bar
@@ -11,7 +12,6 @@
 #include <QNetworkRequest>    // Request API
 #include <QScreen>            // penempatan window di tengah layar
 #include <QVBoxLayout>        // susunan widget jadi vertikal
-#include <QFrame>
 CalculatorWindow::CalculatorWindow(QWidget *parent)
     : QMainWindow(parent), currentMathValue(0.0), pendingMathOp(""),
       waitingForNewOperand(true), isUpdatingBoxes(false), prevTempFromIdx(0),
@@ -38,18 +38,16 @@ void CalculatorWindow::setupUi() {
 
   QFrame *mainFrame = new QFrame(this);
   mainFrame->setObjectName("mainFrame");
-  mainFrame->setStyleSheet(
-      "QFrame#mainFrame { "
-      "background-color: #f0f0f0; "
-      "border-radius: 15px; "
-      "border: 1px solid #c0c0c0; "
-      "}"
-  );
+  mainFrame->setStyleSheet("QFrame#mainFrame { "
+                           "background-color: #f0f0f0; "
+                           "border-radius: 15px; "
+                           "border: 1px solid #c0c0c0; "
+                           "}");
   setCentralWidget(mainFrame);
-  
+
   QVBoxLayout *mainLayout = new QVBoxLayout(mainFrame);
   mainLayout->setContentsMargins(15, 10, 15, 15);
-  
+
   // Custom Title Bar
   QHBoxLayout *titleBarLayout = new QHBoxLayout();
   titleBarLayout->setContentsMargins(0, 0, 0, 10);
@@ -57,20 +55,20 @@ void CalculatorWindow::setupUi() {
   titleIcon->setPixmap(QIcon(":/Images/Icon.ico").pixmap(18, 18));
   QLabel *titleLabel = new QLabel("<b>MyCalculator</b>");
   titleLabel->setStyleSheet("color: #444; font-size: 13px;");
-  
+
   QPushButton *closeBtn = new QPushButton("✕");
   closeBtn->setFixedSize(28, 28);
   closeBtn->setStyleSheet(
-      "QPushButton { background-color: transparent; border: none; font-weight: bold; font-size: 14px; color: #888; border-radius: 14px; }"
-      "QPushButton:hover { background-color: #ff4d4d; color: white; }"
-  );
+      "QPushButton { background-color: transparent; border: none; font-weight: "
+      "bold; font-size: 14px; color: #888; border-radius: 14px; }"
+      "QPushButton:hover { background-color: #ff4d4d; color: white; }");
   connect(closeBtn, &QPushButton::clicked, this, &QWidget::close);
-  
+
   titleBarLayout->addWidget(titleIcon);
   titleBarLayout->addWidget(titleLabel);
   titleBarLayout->addStretch();
   titleBarLayout->addWidget(closeBtn);
-  
+
   mainLayout->addLayout(titleBarLayout);
 
   tabWidget = new QTabWidget(mainFrame);
@@ -338,17 +336,18 @@ void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 void CalculatorWindow::mousePressEvent(QMouseEvent *event) {
-    if (event->button() == Qt::LeftButton) {
-        dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
-        event->accept();
-    }
+  if (event->button() == Qt::LeftButton) {
+    dragPosition =
+        event->globalPosition().toPoint() - frameGeometry().topLeft();
+    event->accept();
+  }
 }
 
 void CalculatorWindow::mouseMoveEvent(QMouseEvent *event) {
-    if (event->buttons() & Qt::LeftButton) {
-        move(event->globalPosition().toPoint() - dragPosition);
-        event->accept();
-    }
+  if (event->buttons() & Qt::LeftButton) {
+    move(event->globalPosition().toPoint() - dragPosition);
+    event->accept();
+  }
 }
 
 void CalculatorWindow::onMathCalculate() {

@@ -29,7 +29,6 @@ set(RESOURCES resources.qrc)
 # For Windows icon (optional but good practice)
 if(WIN32)
     # Using CMake's ability to compile resources on Windows
-    # Assuming we might want to add a win32.rc later. For now, QIcon is enough.
     add_executable(MyCalculator WIN32 ${SOURCES} ${RESOURCES})
 else()
     add_executable(MyCalculator ${SOURCES} ${RESOURCES})
