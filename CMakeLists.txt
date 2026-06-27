@@ -26,7 +26,7 @@ set(SOURCES
 # Resources
 set(RESOURCES resources.qrc)
 
-# For Windows icon (optional but good practice)
+# For Windows icon
 if(WIN32)
     # Using CMake's ability to compile resources on Windows
     add_executable(MyCalculator WIN32 ${SOURCES} ${RESOURCES})
