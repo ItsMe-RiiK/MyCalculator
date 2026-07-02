@@ -1,9 +1,9 @@
-root=true
+root = true
 
-[.]
-end_of_lines=CRLF
+[*]
+end_of_line = lf
 
-[*.{hpp,h,c,cpp,hxx}]
+[*.{hpp,h,c,cpp}]
 indent_style = space
 indent_size = 4
 insert_final_newline = true

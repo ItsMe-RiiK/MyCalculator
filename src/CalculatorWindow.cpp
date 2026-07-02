@@ -1,26 +1,23 @@
-#include "CalculatorWindow.h" // variabel !!!!!!!!!!!!
-#include <QApplication>       // jendela utama
-#include <QClipboard>         // untuk fungsi copy paste hasil konversi
-#include <QFrame>             // border radius
-#include <QGridLayout>        // susunan widget jadi kotak
-#include <QHBoxLayout>        // susunan widget jadi horizontal
-#include <QIcon>              // Ikon di window title bar
-#include <QJsonDocument>      // mengubah data JSON jadi String
-#include <QJsonObject>        // data JSON dalam format objek
-#include <QJsonValue>         // ambil nilai dari JSON
-#include <QKeyEvent>          // Keyboard shortcuts
-#include <QNetworkRequest>    // Request API
-#include <QScreen>            // penempatan window di tengah layar
-#include <QVBoxLayout>        // susunan widget jadi vertikal
+#include "CalculatorWindow.h"
+#include <QApplication>    // jendela utama
+#include <QClipboard>      // untuk fungsi copy paste hasil konversi
+#include <QFrame>          // border radius
+#include <QGridLayout>     // susunan widget jadi kotak
+#include <QHBoxLayout>     // susunan widget jadi horizontal
+#include <QIcon>           // Ikon di window title bar
+#include <QJsonDocument>   // mengubah data JSON jadi String
+#include <QJsonObject>     // data JSON dalam format objek
+#include <QJsonValue>      // ambil nilai dari JSON
+#include <QKeyEvent>       // Keyboard shortcuts
+#include <QNetworkRequest> // Request API
+#include <QScreen>         // penempatan window di tengah layar
+#include <QVBoxLayout>     // susunan widget jadi vertikal
 
 CalculatorWindow::CalculatorWindow(QWidget *parent)
     : QMainWindow(parent), currentMathValue(0.0), pendingMathOp(""),
       waitingForNewOperand(true), isUpdatingBoxes(false), prevTempFromIdx(0),
       prevTempToIdx(1), prevNumFromIdx(0), prevNumToIdx(3), prevCurrFromIdx(0),
-      prevCurrToIdx(1),
-      usdToIdrRate(
-          17000.0) // meskipun fallback, tetep aja sedih wak rupiah melemah
-{
+      prevCurrToIdx(1), usdToIdrRate(17000.0) {
   setupUi();
   networkManager = new QNetworkAccessManager(this);
   connect(networkManager, &QNetworkAccessManager::finished, this,
@@ -34,7 +31,7 @@ void CalculatorWindow::setupUi() {
   setWindowFlags(Qt::FramelessWindowHint | Qt::WindowMinimizeButtonHint);
   setAttribute(Qt::WA_TranslucentBackground);
   setWindowIcon(QIcon(":/Images/Icon.ico"));
-  setWindowTitle("MyCalculator");
+  setWindowTitle("Calculator");
   resize(400, 530);
 
   QFrame *mainFrame = new QFrame(this);
@@ -54,7 +51,7 @@ void CalculatorWindow::setupUi() {
   titleBarLayout->setContentsMargins(0, 0, 0, 10);
   QLabel *titleIcon = new QLabel();
   titleIcon->setPixmap(QIcon(":/Images/Icon.ico").pixmap(18, 18));
-  QLabel *titleLabel = new QLabel("<b>MyCalculator</b>");
+  QLabel *titleLabel = new QLabel("<b>Calculator</b>");
   titleLabel->setStyleSheet("color: #444; font-size: 13px;");
 
   QPushButton *closeBtn = new QPushButton("✕");
@@ -315,7 +312,7 @@ void CalculatorWindow::processMathInput(const QString &text) {
     pendingMathOp = text;
     currentMathValue = mathDisplay->text().toDouble();
     waitingForNewOperand = true;
-    mathDisplay->setText("0"); // clear hantu
+    mathDisplay->setText("0"); // clear
 
     mathHistory->setText(QString::number(currentMathValue, 'g', 15) + " " +
                          pendingMathOp);
